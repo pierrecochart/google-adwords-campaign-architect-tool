@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Architect Pro: PPC Structure & Ad Builder | Pierre Cochart</title>
+    <meta name="description" content="Build complete Google Ads campaigns. Organize ad groups, write RSAs with character limits, and export bulk CSVs. The ultimate tool for PPC managers.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --secondary: #64748b;
+            --border: #e2e8f0;
+            --google-blue: #1a0dab;
+            --google-green: #006621;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); padding: 2rem 1rem; line-height: 1.6; }
+        .container { max-width: 1300px; margin: 0 auto; }
+
+        header { text-align: center; margin-bottom: 2rem; }
+        h1 {
+            font-size: 2.75rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #a855f7 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* Campaign Settings */
+        .campaign-bar {
+            background: var(--card); border: 1px solid var(--border); border-radius: 1rem;
+            padding: 1.5rem; margin-bottom: 2rem; display: grid; grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); align-items: end;
+        }
+        .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--secondary); }
+        input, select { padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--border); font-family: inherit; width: 100%; }
+        
+        /* Negatives Drawer */
+        .negatives-box {
+            background: #f1f5f9; border: 1px dashed var(--secondary); border-radius: 1rem;
+            padding: 1rem 2rem; margin-bottom: 2rem; display: none;
+        }
+        .negatives-box textarea { width: 100%; height: 80px; margin-top: 0.5rem; border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem; }
+
+        /* Ad Group Grid */
+        #adgroup-container { display: flex; flex-direction: column; gap: 2rem; }
+
+        .ad-group-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 1.25rem;
+            padding: 0; display: grid; grid-template-columns: 350px 1fr; overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); animation: fadeIn 0.3s ease;
+        }
+
+        /* Left Side: Keywords */
+        .card-left { background: #f8fafc; padding: 2rem; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 1.5rem; }
+        textarea.kw-input { height: 200px; resize: none; font-family: monospace; font-size: 0.9rem; padding: 1rem; border: 1px solid var(--border); border-radius: 0.5rem; }
+
+        /* Right Side: Ad Copy & Preview */
+        .card-right { padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+        
+        .ad-writer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .headlines-area, .descriptions-area { display: flex; flex-direction: column; gap: 0.75rem; }
+        
+        .limit-input { position: relative; }
+        .limit-input input { padding-right: 3rem; }
+        .char-count { 
+            position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+            font-size: 0.7rem; color: #cbd5e1; font-weight: 600;
+        }
+        .limit-input input:focus + .char-count { color: var(--primary); }
+        .char-count.over { color: #ef4444; }
+
+        /* Google Ad Preview */
+        .ad-preview {
+            background: #fff; border: 1px solid #dfe1e5; border-radius: 8px; padding: 1rem;
+            max-width: 600px; font-family: Arial, sans-serif; margin-top: 1rem;
+        }
+        .ad-url { color: #202124; font-size: 14px; line-height: 1.3; display: flex; gap: 5px; align-items: center; margin-bottom: 5px; }
+        .ad-badge { font-weight: 700; color: var(--text); }
+        .preview-headline { color: #1a0dab; font-size: 20px; line-height: 1.3; cursor: pointer; text-decoration: none; display: block; margin-bottom: 3px; }
+        .preview-headline:hover { text-decoration: underline; }
+        .preview-desc { color: #4d5156; font-size: 14px; line-height: 1.4; }
+
+        /* Actions */
+        .card-actions { 
+            grid-column: span 2; background: #f1f5f9; padding: 1rem; text-align: right;
+            border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-add { background: var(--text); color: white; height: 100%; }
+        .btn-export { background: var(--primary); color: white; padding: 1rem 3rem; font-size: 1.1rem; border-radius: 3rem; box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4); }
+        .btn-export:hover { transform: translateY(-3px); background: var(--primary-dark); }
+        .btn-remove { background: white; border: 1px solid #fee2e2; color: #ef4444; }
+        .btn-remove:hover { background: #fee2e2; }
+        
+        .toggle-neg { color: var(--secondary); font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-top: 0.5rem; display: inline-block; }
+
+        .footer-cta { margin-top: 5rem; text-align: center; border-top: 1px solid var(--border); padding-top: 3rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 1000px) {
+            .ad-group-card { grid-template-columns: 1fr; }
+            .card-left { border-right: none; border-bottom: 1px solid var(--border); }
+            .ad-writer-grid { grid-template-columns: 1fr; }
+            .campaign-bar { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Campaign Architect Pro</h1>
+            <p style="color: var(--secondary);">Structure, Write, and Deploy Google Ads Campaigns.</p>
+        </header>
+
+        <div class="campaign-bar">
+            <div class="input-group">
+                <label>Campaign Name</label>
+                <input type="text" id="campaign-name" placeholder="e.g. [Search] US - Brand Alpha">
+                <span class="toggle-neg" onclick="toggleNegatives()">Edit Negative Keywords</span>
+            </div>
+            <div class="input-group">
+                <label>Match Strategy</label>
+                <select id="match-strategy">
+                    <option value="Mixed">Mixed (Broad + Phrase + Exact)</option>
+                    <option value="Broad">Broad Match Only</option>
+                    <option value="Phrase">Phrase Match Only</option>
+                    <option value="Exact">Exact Match Only</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Daily Budget</label>
+                <input type="number" id="budget" placeholder="50.00">
+            </div>
+            <button class="btn btn-add" onclick="addAdGroup()">+ Add Ad Group</button>
+        </div>
+
+        <div class="negatives-box" id="negatives-box">
+            <label>Campaign Negative Keywords (One per line)</label>
+            <textarea id="negatives-input" placeholder="free&#10;cheap&#10;jobs&#10;salary"></textarea>
+        </div>
+
+        <div id="adgroup-container">
+            </div>
+
+        <div style="text-align: center; margin-top: 4rem;">
+            <button class="btn btn-export" onclick="exportCSV()">Download Editor CSV</button>
+            <p style="font-size: 0.8rem; color: var(--secondary); margin-top: 1rem;">Generates a bulk sheet compatible with Google Ads Editor.</p>
+        </div>
+
+        <footer class="footer-cta">
+            <a href="https://www.buymeacoffee.com/PierreCochart" target="_blank">
+                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px; width: 217px;">
+            </a>
+            <p style="margin-top: 1.5rem; font-size: 0.8rem; color: var(--secondary);">Built by Pierre Cochart</p>
+        </footer>
+    </div>
+
+    <script>
+        let agCount = 0;
+
+        function addAdGroup() {
+            agCount++;
+            const container = document.getElementById('adgroup-container');
+            const card = document.createElement('div');
+            card.className = 'ad-group-card';
+            card.id = `ag-${agCount}`;
+            
+            // HTML Structure for the Card
+            card.innerHTML = `
+                <div class="card-left">
+                    <div class="input-group">
+                        <label>Ad Group Name</label>
+                        <input type="text" class="ag-name" placeholder="Theme Name (e.g. Red Shoes)">
+                    </div>
+                    <div class="input-group">
+                        <label>Keywords</label>
+                        <textarea class="kw-input" placeholder="red shoes&#10;buy red sneakers"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Target URL</label>
+                        <input type="text" class="final-url" placeholder="https://site.com/red-shoes" oninput="updatePreview(${agCount})">
+                    </div>
+                </div>
+
+                <div class="card-right">
+                    <div class="ad-writer-grid">
+                        <div class="headlines-area">
+                            <label>Headlines (30)</label>
+                            ${createInput(agCount, 'h1', 30, 'Headline 1')}
+                            ${createInput(agCount, 'h2', 30, 'Headline 2')}
+                            ${createInput(agCount, 'h3', 30, 'Headline 3')}
+                        </div>
+                        <div class="descriptions-area">
+                            <label>Descriptions (90)</label>
+                            ${createInput(agCount, 'd1', 90, 'Description 1')}
+                            ${createInput(agCount, 'd2', 90, 'Description 2')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label>Ad Preview</label>
+                        <div class="ad-preview">
+                            <div class="ad-url">
+                                <span class="ad-badge">Ad</span> · <span class="preview-url-text" id="prev-url-${agCount}">example.com/</span>
+                            </div>
+                            <div class="preview-headline" id="prev-head-${agCount}">
+                                Headline 1 | Headline 2 | Headline 3
+                            </div>
+                            <div class="preview-desc" id="prev-desc-${agCount}">
+                                Description 1. Description 2.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <span style="font-size: 0.8rem; color: var(--secondary);">ID: AG-${agCount}</span>
+                    <button class="btn btn-remove" onclick="removeGroup(${agCount})">Remove Ad Group</button>
+                </div>
+            `;
+            
+            container.appendChild(card);
+        }
+
+        function createInput(id, type, limit, ph) {
+            return `
+                <div class="limit-input">
+                    <input type="text" class="ad-field ${type}" placeholder="${ph}" maxlength="${limit}" oninput="updateCharCount(this, ${limit}); updatePreview(${id})">
+                    <span class="char-count">${limit}</span>
+                </div>
+            `;
+        }
+
+        function updateCharCount(input, limit) {
+            const count = input.value.length;
+            const remaining = limit - count;
+            const counter = input.nextElementSibling;
+            counter.textContent = remaining;
+            
+            if (remaining < 0) counter.classList.add('over');
+            else counter.classList.remove('over');
+        }
+
+        function updatePreview(id) {
+            const card = document.getElementById(`ag-${id}`);
+            
+            const h1 = card.querySelector('.h1').value || 'Headline 1';
+            const h2 = card.querySelector('.h2').value || 'Headline 2';
+            const h3 = card.querySelector('.h3').value || 'Headline 3';
+            
+            const d1 = card.querySelector('.d1').value || 'Description 1.';
+            const d2 = card.querySelector('.d2').value || 'Description 2.';
+            
+            let url = card.querySelector('.final-url').value;
+            // Extract domain for display
+            try {
+                url = new URL(url).hostname;
+            } catch(e) { url = 'example.com'; }
+
+            document.getElementById(`prev-head-${id}`).textContent = `${h1} | ${h2} | ${h3}`;
+            document.getElementById(`prev-desc-${id}`).textContent = `${d1} ${d2}`;
+            document.getElementById(`prev-url-${id}`).textContent = url + '/';
+        }
+
+        function removeGroup(id) {
+            document.getElementById(`ag-${id}`).remove();
+        }
+
+        function toggleNegatives() {
+            const box = document.getElementById('negatives-box');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function exportCSV() {
+            const campName = document.getElementById('campaign-name').value || 'Campaign 1';
+            const strategy = document.getElementById('match-strategy').value;
+            const budget = document.getElementById('budget').value || '10';
+            const negatives = document.getElementById('negatives-input').value.split('\n');
+            const cards = document.querySelectorAll('.ad-group-card');
+
+            if (cards.length === 0) { alert('Add an Ad Group first.'); return; }
+
+            // CSV Header for Google Ads Editor
+            let csv = `Campaign,Ad Group,Keyword,Match Type,Headline 1,Headline 2,Headline 3,Description 1,Description 2,Final URL,Campaign Daily Budget,Criterion Type\n`;
+
+            // 1. Campaign Negatives
+            negatives.forEach(neg => {
+                if(neg.trim()) {
+                    csv += `"${campName}","","${neg.trim()}","Negative","","","","","","","","Campaign Negative"\n`;
+                }
+            });
+
+            cards.forEach(card => {
+                const agName = card.querySelector('.ag-name').value || 'Ad Group 1';
+                const keywords = card.querySelector('.kw-input').value.split('\n');
+                
+                // Ad Copy Data
+                const h1 = card.querySelector('.h1').value;
+                const h2 = card.querySelector('.h2').value;
+                const h3 = card.querySelector('.h3').value;
+                const d1 = card.querySelector('.d1').value;
+                const d2 = card.querySelector('.d2').value;
+                const url = card.querySelector('.final-url').value;
+
+                // 2. Create Ad Row (Responsive Search Ad)
+                // Note: Editor CSV format treats ads and keywords as separate rows usually, but we can combine for simple uploads
+                // Or standard practice: One row per entity.
+                // Let's generate Ad Row first
+                csv += `"${campName}","${agName}","","","${h1}","${h2}","${h3}","${d1}","${d2}","${url}","${budget}","Responsive Search Ad"\n`;
+
+                // 3. Create Keyword Rows
+                keywords.forEach(kw => {
+                    if (!kw.trim()) return;
+                    const clean = kw.trim();
+
+                    if (strategy === 'Mixed') {
+                        csv += `"${campName}","${agName}","${clean}","Broad","","","","","","","","Keyword"\n`;
+                        csv += `"${campName}","${agName}","${clean}","Phrase","","","","","","","","Keyword"\n`;
+                        csv += `"${campName}","${agName}","${clean}","Exact","","","","","","","","Keyword"\n`;
+                    } else {
+                        csv += `"${campName}","${agName}","${clean}","${strategy}","","","","","","","","Keyword"\n`;
+                    }
+                });
+            });
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `campaign_export_${campName.replace(/\s/g, '_')}.csv`;
+            link.click();
+        }
+        
+        // Init
+        addAdGroup();
+    </script>
+</body>
+</html>
